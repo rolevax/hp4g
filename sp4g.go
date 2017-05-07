@@ -1,11 +1,11 @@
 // Copyright 2017 Rolevax. All rights reserved.
 
-// Package hp4g implements functions to read and write
+// Package sp4g implements functions to read and write
 // simple "size + payload" messages.
 //
 // The size header takes 4 bytes thus the payload can be up to 4 GiB.
 // The 4-byte-header is encoded in big endian.
-package hp4g
+package sp4g
 
 import (
 	"encoding/binary"

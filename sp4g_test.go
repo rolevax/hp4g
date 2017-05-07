@@ -1,4 +1,4 @@
-package hp4g
+package sp4g
 
 import (
 	"bytes"
