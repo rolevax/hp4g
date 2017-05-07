@@ -16,14 +16,39 @@ import (
 
 // Read is just read.
 func Read(reader io.Reader) ([]byte, error) {
-	var size uint32
-	err := binary.Read(reader, binary.BigEndian, &size)
+	size, err := readSize(reader)
+	if err != nil {
+		return nil, err
+	}
+	return readPayload(reader, size)
+}
+
+// ReadN reads up to n bytes
+func ReadN(reader io.Reader, n uint32) ([]byte, error) {
+	size, err := readSize(reader)
 	if err != nil {
 		return nil, err
 	}
 
+	if size > n {
+		return nil, errors.New("sp4g: ReadN size blown")
+	}
+
+	return readPayload(reader, size)
+}
+
+func readSize(reader io.Reader) (uint32, error) {
+	var size uint32
+	err := binary.Read(reader, binary.BigEndian, &size)
+	if err != nil {
+		return 0, err
+	}
+	return size, nil
+}
+
+func readPayload(reader io.Reader, size uint32) ([]byte, error) {
 	p := make([]byte, size)
-	_, err = io.ReadFull(reader, p)
+	_, err := io.ReadFull(reader, p)
 	if err != nil {
 		return nil, err
 	}
@@ -36,7 +61,7 @@ func Write(conn io.Writer, data []byte) error {
 	if l == 0 {
 		return nil
 	} else if l >= (1 << 32) {
-		return errors.New("hp4g: too big data" + strconv.Itoa(l))
+		return errors.New("sp4g: too big data" + strconv.Itoa(l))
 	}
 
 	size := uint32(len(data))
